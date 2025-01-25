@@ -10,7 +10,6 @@ import Footer from './Components/Footer';
 
 const HomePage = () => {
 
-
   return (
     <div className="min-h-screen relative font-sans">
       {/* Background Image with Overlay */}
@@ -28,11 +27,11 @@ const HomePage = () => {
       {/* Hero Section */}
       <Hero/>
 
-      {/* Featured Properties */}
-      <Properties/>
-
       {/* Why Choose Us */}
       <WhyUs/>
+
+      {/* Featured Properties */}
+      <Properties/>
 
       {/* Footer */}
       <Footer/>

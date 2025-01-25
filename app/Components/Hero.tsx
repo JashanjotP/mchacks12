@@ -5,7 +5,10 @@ const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   return (
-    <header className="relative pt-36 pb-16 px-8 z-10">
+    <header className="relative mt-4 mx-5 pt-36 pb-36 px-8 z-10 bg-amber-100/90 backdrop-blur-sm shadow-md"
+      style={{
+        borderBottomRightRadius: '5rem',
+        borderBottomLeftRadius: '5rem'}}>
         <div className="container mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-6">
             <h2 className="text-5xl font-extrabold text-amber-900 leading-tight">

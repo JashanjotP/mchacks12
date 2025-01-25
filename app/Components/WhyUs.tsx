@@ -3,7 +3,7 @@ import { MapPin, Users, Check } from 'lucide-react'
 
 const WhyUs = () => {
   return (
-    <section className="bg-amber-50 py-16 relative z-10">
+    <section className=" py-24 relative z-10 mx-5">
         <div className="container mx-auto px-4">
           <h3 className="text-4xl font-bold text-center text-amber-900 mb-12">
             What is The Student Sphere?
@@ -28,7 +28,7 @@ const WhyUs = () => {
             ].map((feature, index) => (
               <div 
                 key={index} 
-                className="bg-white p-8 rounded-2xl text-center shadow-md hover:shadow-lg transition"
+                className="bg-[#ecebe2] p-8 rounded-2xl text-center shadow-md hover:shadow-lg transition"
               >
                 {feature.icon}
                 <h4 className="text-2xl font-bold text-amber-900 mb-4">
