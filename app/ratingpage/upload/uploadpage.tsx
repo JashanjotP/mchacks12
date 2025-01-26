@@ -11,6 +11,7 @@ import { ImagePlus, X } from 'lucide-react';
 import { useLoadScript, Autocomplete } from '@react-google-maps/api';
 import { collection, doc, GeoPoint, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
 import app from '@/firebase/config';
+import { upload } from '@vercel/blob/client';
 
 const ReviewUploadPage = () => {
   const [formData, setFormData] = useState({
@@ -79,7 +80,7 @@ const ReviewUploadPage = () => {
     }
   };
 
-  // Handle file uploads (same as previous implementation)
+  // Handle file uploads with Vercel Blob
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     const validImageFiles = files.filter(file => 
@@ -171,10 +172,29 @@ const ReviewUploadPage = () => {
 
         // Create house document with auto ID
         const houseRef = doc(collection(db, "house"));
+
+        // Upload images to Vercel Blob and get URLs
+        const imageUrls = await Promise.all(
+          formData.housePhotos.map(async (file) => {
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            const response = await fetch('/api/upload', {
+              method: 'PUT',
+              body: formData
+            });
+            
+            const blob = await response.json();
+            return blob.url;
+          })
+        );
+
+        // Add house document with image URLs
         await setDoc(houseRef, {
           address: formData.address,
           landlord: formData.landlordName,
-          location: new GeoPoint(formData.latitude, formData.longitude)
+          location: new GeoPoint(formData.latitude, formData.longitude),
+          imageUrls: imageUrls[0]
         });
 
         // Add review as subcollection document
