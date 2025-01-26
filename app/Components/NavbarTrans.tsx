@@ -1,9 +1,9 @@
 import React from 'react'
 import { Home } from 'lucide-react' 
 
-const Navbar = () => {
+const NavbarTrans = () => {
   return (
-    <nav className="fixed mx-5 mt-2 rounded-3xl top-0 left-0 right-0 bg-amber-100/90 backdrop-blur-sm shadow-md z-50">
+    <nav className="fixed mx-5 mt-2 rounded-3xl top-0 left-0 right-0 bg-[#f1f0e840] backdrop-blur-sm shadow-md z-50">
         <div className="container mx-auto px-6 py-6 flex justify-between items-center">
           <div className="flex items-center">
             <Home className="text-amber-600 mr-4" size={30} />
@@ -20,4 +20,4 @@ const Navbar = () => {
   )
 }
 
-export default Navbar
+export default NavbarTrans

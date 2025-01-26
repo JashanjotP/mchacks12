@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Home, Users, Search, MapPin, Star, Check } from 'lucide-react';
 import Navbar from './Components/Navbar';
 import Hero from './Components/Hero';
 import Properties from './Components/Properties';
@@ -9,7 +8,6 @@ import WhyUs from './Components/WhyUs';
 import Footer from './Components/Footer';
 
 const HomePage = () => {
-
 
   return (
     <div className="min-h-screen relative font-sans">
@@ -28,11 +26,11 @@ const HomePage = () => {
       {/* Hero Section */}
       <Hero/>
 
-      {/* Featured Properties */}
-      <Properties/>
-
       {/* Why Choose Us */}
       <WhyUs/>
+
+      {/* Featured Properties */}
+      <Properties/>
 
       {/* Footer */}
       <Footer/>
