@@ -13,6 +13,7 @@ import { collection, doc, GeoPoint, getFirestore, serverTimestamp, setDoc } from
 import app from '@/firebase/config';
 
 const ReviewUploadPage = () => {
+  
   const [formData, setFormData] = useState({
     housePhotos: [],
     address: '',
@@ -20,7 +21,6 @@ const ReviewUploadPage = () => {
     longitude: null,
     rent: '',
     landlordName: '',
-    rent: '',
     landlordRating: '',
     houseRating: '',
     labels: [],
@@ -163,7 +163,7 @@ const ReviewUploadPage = () => {
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
       try {
         // Get reference to Firestore

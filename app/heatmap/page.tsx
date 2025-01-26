@@ -16,7 +16,7 @@ export default function HeatMapPage() {
             </p>
           </div>
           <div className="p-4 h-[400px]">
-            <GuelphRentalHeatMap apiKey={process.env.GOOGLE_MAPS_API_KEY} />
+            <GuelphRentalHeatMap apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY} />
           </div>
           <div className="p-6 bg-gray-50 text-sm text-gray-600">
             <p>
