@@ -194,7 +194,7 @@ const HouseProfilePage = ({ id }: { id: string }) => {
             ))}
           </CardContent>
         </Card>
-        <CreateReviewDialog houseData={houseData} />
+        <CreateReviewDialog id={id} name={houseData.houseName} />
       </div>
     </div>
   );
