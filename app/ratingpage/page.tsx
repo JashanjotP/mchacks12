@@ -137,7 +137,7 @@ const PropertyRatings = () => {
                   {listing.features.map((feature) => (
                     <span 
                       key={feature} 
-                      className="bg-amber-100 text-amber-800 px-5 py-3 text-md"
+                      className="bg-[#FEF3C7] text-[#78350F] rounded-lg px-5 py-3 text-md"
                     >
                       {feature}
                     </span>
