@@ -46,7 +46,7 @@ const ReviewUploadPage = () => {
     { name: 'Poor Maintance', color: '#E5E7EB' },
     { name: 'Hidden fees', color: '#FDE68A' },
     { name: 'Parking issues', color: '#D1FAE5' },
-    { name: 'Poor maintance', color: '#FEF3C7' },
+    { name: 'Bad Landlord', color: '#FEF3C7' },
     { name: 'Old appliances', color: '#D1FAE5' },
     { name: 'Lease restrictions', color: '#DBEAFE' },
   ];
@@ -203,6 +203,9 @@ const ReviewUploadPage = () => {
         });
 
         console.log('Successfully submitted review');
+        
+        // Redirect to '/ratingpage'
+        window.location.href = '/ratingpage';
       } catch (error) {
         console.error('Error submitting review:', error);
       }

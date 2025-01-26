@@ -11,7 +11,7 @@ const NavbarTrans = () => {
           </div>
           <div className="space-x-12">
             <a href="/" className="text-amber-800 hover:text-amber-600 transition">Home</a>
-            <a href="/ratingpage" className="text-amber-800 hover:text-amber-600 transition">Rate Houses</a>
+            <a href="/ratingpage" className="text-amber-800 hover:text-amber-600 transition">House Ratings</a>
             <a href="/heatmap" className="text-amber-800 hover:text-amber-600 transition">Heat Map</a>
             <a href="/lease" className="text-amber-800 hover:text-amber-600 transition">Check my Lease</a>
           </div>

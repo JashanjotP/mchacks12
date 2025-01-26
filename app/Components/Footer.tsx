@@ -6,20 +6,21 @@ const Footer = () => {
         <div className="container grid md:grid-cols-3 gap-8 px-5">
           <div>
             <h5 className="text-2xl font-bold mb-4">Student Sphere</h5>
-            <p>Your trusted partner in finding the perfect student housing.</p>
+            <p> We're a community to help students find homes they love.</p>
           </div>
           <div>
             <h6 className="font-bold mb-4">Quick Links</h6>
             <ul className="space-y-2">
-              <li><a href="#" className="hover:text-amber-200 transition">Search Properties</a></li>
-              <li><a href="#" className="hover:text-amber-200 transition">About Us</a></li>
-              <li><a href="#" className="hover:text-amber-200 transition">Contact</a></li>
+              <li><a href="/" className="hover:text-amber-200 transition">Home</a></li>
+              <li><a href="/ratingpage" className="hover:text-amber-200 transition">House Ratings</a></li>
+              <li><a href="/heatmap" className="hover:text-amber-200 transition">Heat Map</a></li>
+              <li><a href="/lease" className="hover:text-amber-200 transition">Check my Lease</a></li>
             </ul>
           </div>
           <div>
             <h6 className="font-bold mb-4">Contact</h6>
-            <p>Email: support@studentnest.com</p>
-            <p>Phone: (555) 123-4567</p>
+            <p>Email: pharpala@uoguelph.ca</p>
+            <p>Phone: (226) 501-7697</p>
           </div>
         </div>
     </footer>
