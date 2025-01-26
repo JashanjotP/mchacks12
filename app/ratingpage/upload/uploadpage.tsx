@@ -11,7 +11,6 @@ import { ImagePlus, X } from 'lucide-react';
 import { useLoadScript, Autocomplete } from '@react-google-maps/api';
 import { collection, doc, GeoPoint, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
 import app from '@/firebase/config';
-import { upload } from '@vercel/blob/client';
 
 const ReviewUploadPage = () => {
   const [formData, setFormData] = useState({
@@ -194,7 +193,7 @@ const ReviewUploadPage = () => {
           address: formData.address,
           landlord: formData.landlordName,
           location: new GeoPoint(formData.latitude, formData.longitude),
-          imageUrls: imageUrls[0]
+          imageUrl: imageUrls[0]
         });
 
         // Add review as subcollection document
