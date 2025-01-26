@@ -20,6 +20,7 @@ const ReviewUploadPage = () => {
     longitude: null,
     rent: '',
     landlordName: '',
+    rent: '',
     landlordRating: '',
     houseRating: '',
     labels: [],
@@ -426,8 +427,8 @@ const ReviewUploadPage = () => {
               {/* Submit Button */}
               <Button 
                 type="button" 
+                onClick={handleSubmit} 
                 className="w-full bg-[#D97706] hover:bg-[#B45309] text-white transition-colors duration-300 transform hover:scale-[1.02]"
-                onClick={handleSubmit}
               >
                 Submit Review
               </Button>
