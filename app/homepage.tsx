@@ -10,7 +10,7 @@ import Footer from './Components/Footer';
 const HomePage = () => {
 
   return (
-    <div className="min-h-screen relative font-sans">
+    <div className="min-h-screen relative font-sans bg-[#ffffff]">
       {/* Background Image with Overlay */}
       <div 
         className="absolute inset-0 bg-cover bg-center opacity-10 z-0"
