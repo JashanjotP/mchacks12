@@ -104,8 +104,9 @@ const PropertyRatings = () => {
         <div className="space-y-6">
           {filteredListings.map((listing) => (
             <div 
-              key={listing.id} 
-              className="bg-[#f9f9f6] rounded-2xl shadow-md hover:shadow-lg transition grid grid-cols-[300px_1fr] overflow-hidden"
+              key={listing.id}
+              onClick={() => window.location.href = `/ratingpage/${listing.id}`}
+              className="bg-[#f9f9f6] rounded-2xl shadow-md hover:shadow-lg transition grid grid-cols-[300px_1fr] overflow-hidden cursor-pointer" 
             >
               {/* Property Photo */}
               <div className="w-full h-full p-5 ">
