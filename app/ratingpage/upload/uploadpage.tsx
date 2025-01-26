@@ -173,27 +173,31 @@ const ReviewUploadPage = () => {
         const houseRef = doc(collection(db, "house"));
 
         // Upload images to Vercel Blob and get URLs
-        const imageUrls = await Promise.all(
-          formData.housePhotos.map(async (file) => {
-            const formData = new FormData();
-            formData.append('file', file);
-            
-            const response = await fetch('/api/upload', {
-              method: 'PUT',
-              body: formData
-            });
-            
-            const blob = await response.json();
-            return blob.url;
-          })
-        );
+        let imageUrl = '';
+        if (formData.housePhotos && formData.housePhotos.length > 0) {
+          const imageUrls = await Promise.all(
+            formData.housePhotos.map(async (file) => {
+              const formData = new FormData();
+              formData.append('file', file);
+              
+              const response = await fetch('/api/upload', {
+                method: 'PUT',
+                body: formData
+              });
+              
+              const blob = await response.json();
+              return blob.url;
+            })
+          );
+          imageUrl = imageUrls[0];
+        }
 
         // Add house document with image URLs
         await setDoc(houseRef, {
           address: formData.address,
           landlord: formData.landlordName,
           location: new GeoPoint(formData.latitude, formData.longitude),
-          imageUrl: imageUrls[0]
+          imageUrl: imageUrl
         });
 
         // Add review as subcollection document

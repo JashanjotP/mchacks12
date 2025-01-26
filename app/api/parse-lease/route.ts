@@ -60,6 +60,7 @@ export async function POST(req: Request) {
     console.log('Received response from OpenAI');
     const analysisResult = response.choices[0].message.content;
     console.log('Analysis result length:', analysisResult.length);
+    console.log(analysisResult)
 
     return NextResponse.json({ response: analysisResult });
   } catch (error) {

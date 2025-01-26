@@ -122,7 +122,7 @@ const GuelphRentalHeatMap = ({ apiKey }: { apiKey: string }) => {
           <div key={index}>
             <Circle
               center={{ lat: rental.lat, lng: rental.lng }}
-              radius={25}
+              radius={50}
               options={{
                 strokeColor: color,
                 strokeOpacity: 0.8,
