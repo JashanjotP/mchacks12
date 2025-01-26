@@ -13,18 +13,18 @@ const WhyUs = () => {
               {
                 icon: <Users className="text-amber-600 mb-4" size={50} />,
                 title: "House and Landlord Ratings",
-                description: "Housing options strategically located near universities and campuses."
+                description: "Verify your University email to leave reviews of your landlord and house."
               },
               {
                 icon: <Check className="text-amber-600 mb-4" size={50} />,
-                title: "Review your lease",
-                description: "Designed to foster student connections and collaborative living."
+                title: "Review Your Lease",
+                description: "Scan your lease for hidden clauses, fees, and tenant protections with ease."
               },
               {
                 icon: <MapPin className="text-amber-600 mb-4" size={50} />,
                 title: "Heat Map",
-                description: "Every property is carefully vetted for quality and student needs."
-              }
+                description: "Visualize housing availability and rent prices in neighborhoods near your campus."
+              }              
             ].map((feature, index) => (
               <div 
                 key={index} 

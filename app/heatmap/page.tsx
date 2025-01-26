@@ -1,3 +1,4 @@
+import Footer from "../Components/Footer";
 import GuelphRentalHeatMap from "../Components/Heatmap";
 import NavbarTrans from "../Components/NavbarTrans";
 
@@ -24,6 +25,7 @@ export default function HeatMapPage() {
           </div>
         </div>
       </div>
+      <Footer/>
     </div>
   );
 }
