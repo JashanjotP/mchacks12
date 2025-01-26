@@ -14,6 +14,7 @@ const ReviewUploadPage = () => {
     housePhotos: [],
     address: '',
     landlordName: '',
+    rent: '',
     landlordRating: '',
     houseRating: '',
     labels: [],
@@ -123,6 +124,10 @@ const ReviewUploadPage = () => {
       errors.description = 'Description is required';
     }
 
+    if (!formData.rent.trim()) {
+        errors.rent = 'Rent is required';
+    }
+
     if (!formData.housePhotos) {
         console.log("optional");
     }
@@ -230,19 +235,35 @@ const ReviewUploadPage = () => {
               </div>
 
               {/* Landlord Name */}
-              <div>
-                <Label className="text-[#78350F] font-semibold">Landlord Name</Label>
-                <Input 
-                  type="text" 
-                  name="landlordName"
-                  value={formData.landlordName}
-                  onChange={handleInputChange}
-                  placeholder="Enter landlord's name"
-                  className={`mt-2 focus:border-[#D97706] focus:ring-[#D97706] ${formErrors.landlordName ? 'border-red-500' : ''}`}
-                />
-                {formErrors.landlordName && (
-                  <p className="text-red-500 text-sm mt-1">{formErrors.landlordName}</p>
-                )}
+              <div className="flex justify-between gap-4">
+                <div className="w-1/2">
+                  <Label className="text-[#78350F] font-semibold">Landlord Name</Label>
+                  <Input 
+                    type="text" 
+                    name="landlordName"
+                    value={formData.landlordName}
+                    onChange={handleInputChange}
+                    placeholder="Enter landlord's name"
+                    className={`mt-2 focus:border-[#D97706] focus:ring-[#D97706] ${formErrors.landlordName ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.landlordName && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.landlordName}</p>
+                  )}
+                </div>
+                <div className="w-1/2">
+                  <Label className="text-[#78350F] font-semibold">Rent</Label>
+                  <Input 
+                    type="number" 
+                    name="rent"
+                    value={formData.rent}
+                    onChange={handleInputChange}
+                    placeholder="Enter rent amount"
+                    className={`mt-2 focus:border-[#D97706] focus:ring-[#D97706] ${formErrors.rent ? 'border-red-500' : ''}`}
+                  />
+                  {formErrors.rent && (
+                    <p className="text-red-500 text-sm mt-1">{formErrors.rent}</p>
+                  )}
+                </div>
               </div>
 
               {/* Ratings */}
@@ -327,7 +348,8 @@ const ReviewUploadPage = () => {
 
               {/* Submit Button */}
               <Button 
-                type="submit" 
+                type="button" 
+                onClick={handleSubmit} 
                 className="w-full bg-[#D97706] hover:bg-[#B45309] text-white transition-colors duration-300 transform hover:scale-[1.02]"
               >
                 Submit Review
