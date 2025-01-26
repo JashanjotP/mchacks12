@@ -9,9 +9,21 @@ import app from "@/firebase/config";
 
 const db = getFirestore(app);
 
+interface PropertyListing {
+  id: string;
+  name: string;
+  photo: string;
+  location: string;
+  rating: number;
+  reviews: number;
+  avgRent: number;
+  features: string[];
+  landlord: string;
+}
+
 const PropertyRatings = () => {
   const [filterLocation, setFilterLocation] = useState('');
-  const [propertyListings, setPropertyListings] = useState([]);
+  const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
 
   useEffect(() => {
     const fetchProperties = async () => {
@@ -52,7 +64,7 @@ const PropertyRatings = () => {
           return {
             id: houseDoc.id,
             name: houseData.address,
-            photo: houseData.imageUrl || "", // You might want to store actual photos in Firebase Storage
+            photo: houseData.imageUrl || "/house.png", // You might want to store actual photos in Firebase Storage
             location: houseData.location || "Location not specified",
             rating: avgHouseRating,
             reviews: reviews,
@@ -74,14 +86,14 @@ const PropertyRatings = () => {
   // Filtering logic
   const filteredListings = propertyListings.filter(listing => 
     !filterLocation || 
-    listing.location.toLowerCase().includes(filterLocation.toLowerCase())
+    listing.name.toLowerCase().includes(filterLocation.toLowerCase())
   );
 
   return (
     <>
     <NavbarTrans/>
     <div className="min-h-screen bg-[#f1f0e8] p-8">
-      <div className="container mx-auto mt-20">
+      <div className="container mx-auto my-20">
         <h1 className="text-4xl font-bold text-amber-900 mb-8">
           Property Ratings
         </h1>
@@ -109,13 +121,14 @@ const PropertyRatings = () => {
               className="bg-[#f9f9f6] rounded-2xl shadow-md hover:shadow-lg transition grid grid-cols-[300px_1fr] overflow-hidden cursor-pointer" 
             >
               {/* Property Photo */}
-              <div className="w-full h-full p-5 ">
+              <div className="w-full h-auto p-5 flex justify-center">
                 <img 
-                  src={listing.photo} 
-                  alt={listing.name} 
-                  className="w-full h-full border border-gray object-cover rounded-xl"
+                    src={listing.photo} 
+                    alt={listing.name} 
+                    className="w-55 h-40 border border-gray object-cover rounded-xl"
                 />
               </div>
+
 
               {/* Property Details */}
               <div className="p-6 relative">
@@ -160,6 +173,13 @@ const PropertyRatings = () => {
               </div>
             </div>
           ))}
+        </div>
+        <div className="mt-10 text-right">
+          <a href="/ratingpage/upload">
+            <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-800">
+              Create New Review
+            </button>
+          </a>
         </div>
       </div>
     </div>
