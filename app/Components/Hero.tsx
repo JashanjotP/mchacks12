@@ -12,11 +12,15 @@ const Hero = () => {
         <div className="container mx-auto grid md:grid-cols-2 gap-10 items-center">
           <div className="space-y-6">
             <h2 className="text-5xl font-extrabold text-amber-900 leading-tight">
-              Find Your Perfect Student Housing
+              A Housing Community for students, empowered by verified students!
             </h2>
-            <p className="text-xl text-amber-800 opacity-80">
-              Discover comfortable, affordable, and convenient housing options designed specifically for students.
-            </p>
+            <ul className="list-disc pl-5 text-xl text-amber-800 opacity-80">
+              <li>✔️ Trusted by over 50 verified students.</li>
+              <li>✔️ Analyze leases for hidden fees and risks.</li>
+              <li>✔️ Compare the cheapest rents near you.</li>
+              <li>✔️ Read honest reviews from fellow students.</li>
+            </ul>
+
             
             {/* Search Bar */}
             <div className="relative">

@@ -9,11 +9,11 @@ const NavbarTrans = () => {
             <Home className="text-amber-600 mr-4" size={30} />
             <h1 className="text-2xl font-bold text-amber-900">Student Sphere</h1>
           </div>
-          <div className="space-x-6">
-            <a href="#" className="text-amber-800 hover:text-amber-600 transition">Home</a>
-            <a href="#" className="text-amber-800 hover:text-amber-600 transition">Properties</a>
-            <a href="#" className="text-amber-800 hover:text-amber-600 transition">About</a>
-            <a href="#" className="text-amber-800 hover:text-amber-600 transition">Contact</a>
+          <div className="space-x-12">
+            <a href="/" className="text-amber-800 hover:text-amber-600 transition">Home</a>
+            <a href="/ratingpage" className="text-amber-800 hover:text-amber-600 transition">Rate Houses</a>
+            <a href="/heatmap" className="text-amber-800 hover:text-amber-600 transition">Heat Map</a>
+            <a href="/lease" className="text-amber-800 hover:text-amber-600 transition">Check my Lease</a>
           </div>
         </div>
     </nav>
