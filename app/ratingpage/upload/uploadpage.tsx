@@ -11,12 +11,8 @@ import { ImagePlus, X } from 'lucide-react';
 import { useLoadScript, Autocomplete } from '@react-google-maps/api';
 import { collection, doc, GeoPoint, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
 import app from '@/firebase/config';
-import { useUser } from '@auth0/nextjs-auth0/client';
-import { useRouter } from 'next/navigation';
 
 const ReviewUploadPage = () => {
-  const { user, isLoading } = useUser();
-  const router = useRouter();
   
   const [formData, setFormData] = useState({
     housePhotos: [],
@@ -168,11 +164,6 @@ const ReviewUploadPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      router.push('/api/auth/login');
-      return;
-    }
-
     if (validateForm()) {
       try {
         // Get reference to Firestore
@@ -217,9 +208,7 @@ const ReviewUploadPage = () => {
           houseRating: parseFloat(formData.houseRating),
           landlordRating: parseFloat(formData.landlordRating), 
           rent: parseFloat(formData.rent),
-          tags: formData.labels,
-          userId: user.sub,
-          userEmail: user.email
+          tags: formData.labels
         });
 
         // Reset form after successful submission
@@ -250,7 +239,7 @@ const ReviewUploadPage = () => {
     }
   };
 
-  if (isLoading || !isLoaded) {
+  if (!isLoaded) {
     return <div>Loading...</div>;
   }
 
@@ -264,17 +253,6 @@ const ReviewUploadPage = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="p-6">
-            {!user ? (
-              <div className="text-center">
-                <p className="mb-4">Please sign in to leave a review</p>
-                <Button 
-                  onClick={() => router.push('/api/auth/login')}
-                  className="bg-[#D97706] hover:bg-[#B45309] text-white"
-                >
-                  Sign In
-                </Button>
-              </div>
-            ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* House Photos Upload */}
               <div>
@@ -478,7 +456,6 @@ const ReviewUploadPage = () => {
                 Submit Review
               </Button>
             </form>
-            )}
           </CardContent>
         </Card>
       </div>
