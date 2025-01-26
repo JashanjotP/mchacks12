@@ -29,9 +29,6 @@ const HomePage = () => {
       {/* Why Choose Us */}
       <WhyUs/>
 
-      {/* Featured Properties */}
-      <Properties/>
-
       {/* Footer */}
       <Footer/>
     </div>

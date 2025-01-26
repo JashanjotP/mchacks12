@@ -8,6 +8,7 @@ import NavbarTrans from '@/app/Components/NavbarTrans';
 import Footer from '@/app/Components/Footer';
 import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore';
 import app from "@/firebase/config";
+import { CreateReviewDialog } from './dialog';
 
 const db = getFirestore(app);
 
@@ -193,6 +194,7 @@ const HouseProfilePage = ({ id }: { id: string }) => {
             ))}
           </CardContent>
         </Card>
+        <CreateReviewDialog houseData={houseData} />
       </div>
     </div>
   );
