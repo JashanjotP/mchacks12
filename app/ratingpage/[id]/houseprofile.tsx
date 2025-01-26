@@ -1,56 +1,92 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import NavbarTrans from '@/app/Components/NavbarTrans';
 import Footer from '@/app/Components/Footer';
+import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore';
+import app from "@/firebase/config";
 
-const HouseProfilePage = () => {
-  // Sample data - replace with actual data from your application
-  const [houseData] = useState({
-    houseName: "Sunset Apartments",
-    labels: ["Cozy", "Modern", "Pet-Friendly"],
-    landlordName: "David Thompson",
-    houseRating: 8.7,
-    landlordRating: 9.2,
-    reviews: [
-      {
-        id: 1,
-        userName: "Emma Johnson",
-        rating: 9,
-        landlordRating: 6,
-        description: "Absolutely loved the spacious living areas and modern amenities. A perfect retreat!",
-        price: 0,
-        date: "2024-01-15"
-      },
-      {
-        id: 2,
-        userName: "Alex Rodriguez",
-        rating: 7,
-        landlordRating: 6,
-        description: "Nice property with great views. Could use some minor updates in the kitchen.",
-        price: 0,
-        date: "2024-01-20"
-      },
-      {
-        id: 3,
-        userName: "Sarah Kim",
-        rating: 8,
-        landlordRating: 6,
-        description: "Comfortable and well-maintained. The location is fantastic!",
-        price: 0,
-        date: "2024-01-22"
-      }
-    ]
+const db = getFirestore(app);
+
+const HouseProfilePage = ({ id }: { id: string }) => {
+  const [houseData, setHouseData] = useState({
+    houseName: "",
+    labels: [],
+    landlordName: "",
+    houseRating: 0,
+    landlordRating: 0,
+    reviews: []
   });
+
+  useEffect(() => {
+    const fetchHouseData = async () => {
+      try {
+        // Get house document
+        const houseId = id
+        const houseDoc = await getDoc(doc(db, 'house', houseId)); // Replace HOUSE_ID with actual ID
+        const houseData = houseDoc.data();
+
+        // Get reviews collection
+        const reviewsCollection = collection(db, 'house', houseId, 'reviews');
+        const reviewsSnapshot = await getDocs(reviewsCollection);
+
+        // Calculate average ratings
+        let totalHouseRating = 0;
+        let totalLandlordRating = 0;
+        const reviews = [];
+
+        reviewsSnapshot.docs.forEach((reviewDoc) => {
+          const reviewData = reviewDoc.data();
+          totalHouseRating += reviewData.houseRating || 0;
+          totalLandlordRating += reviewData.landlordRating || 0;
+          
+          reviews.push({
+            id: reviewDoc.id,
+            rating: reviewData.houseRating,
+            landlordRating: reviewData.landlordRating,
+            description: reviewData.description,
+            price: reviewData.rent,
+            date: reviewData.createdAt?.toDate().toISOString().split('T')[0] || ''
+          });
+        });
+
+        const avgHouseRating = reviews.length > 0 ? totalHouseRating / reviews.length : 0;
+        const avgLandlordRating = reviews.length > 0 ? totalLandlordRating / reviews.length : 0;
+
+        // Get latest review for tags
+        const latestReviewQuery = query(
+          collection(db, 'house', houseId, 'reviews'),
+          orderBy('createdAt', 'desc'),
+          limit(1)
+        );
+        const latestReviewSnapshot = await getDocs(latestReviewQuery);
+        const latestReview = latestReviewSnapshot.docs[0]?.data();
+
+        setHouseData({
+          houseName: houseData.address || "",
+          labels: latestReview?.tags || [],
+          landlordName: houseData.landlord || "",
+          houseRating: avgHouseRating,
+          landlordRating: avgLandlordRating,
+          reviews: reviews
+        });
+
+      } catch (error) {
+        console.error("Error fetching house data:", error);
+      }
+    };
+
+    fetchHouseData();
+  }, []);
 
   // Function to generate rating distribution
   const generateRatingDistribution = () => {
     const ratingCounts = new Array(10).fill(0);
     houseData.reviews.forEach(review => {
-      ratingCounts[review.rating - 1]++;
+      ratingCounts[Math.floor(review.rating) - 1]++;
     });
     return ratingCounts;
   };
@@ -83,10 +119,10 @@ const HouseProfilePage = () => {
             </div>
             <div className="text-right">
               <p className="text-[#78350F]">
-                House Rating: <span className="font-bold text-[#D97706]">{houseData.houseRating}</span>
+                House Rating: <span className="font-bold text-[#D97706]">{houseData.houseRating.toFixed(1)}</span>
               </p>
               <p className="text-[#78350F]">
-                Landlord Rating: <span className="font-bold text-[#D97706]">{houseData.landlordRating}</span>
+                Landlord Rating: <span className="font-bold text-[#D97706]">{houseData.landlordRating.toFixed(1)}</span>
               </p>
             </div>
           </div>
@@ -147,7 +183,7 @@ const HouseProfilePage = () => {
                       </div>
                     </div>
                     <div className="bg-green-200 text-2xl font-bold text-green-800 p-2 rounded-lg inline-block shadow-md">
-                      {review.price.toFixed(1)}
+                      ${review.price.toFixed(2)}
                     </div>
                   </div>
                   <p className="text-[#78350F] text-opacity-80">{review.description}</p>

@@ -140,7 +140,7 @@ const GuelphRentalHeatMap = ({ apiKey }: { apiKey: string }) => {
                 <div style={{ fontSize: '0.9em', maxWidth: '200px' }}>
                   <strong>Address:</strong> {rental.address}<br />
                   <strong>Price:</strong> ${rental.price.toFixed(2)}<br />
-                  <strong>Rating:</strong> {rental.rating.toFixed(1)}/5<br />
+                  <strong>Rating:</strong> {rental.rating.toFixed(1)}/10.0<br />
                   <strong>Price Category:</strong> {priceBucket}
                 </div>
               </InfoWindow>
