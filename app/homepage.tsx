@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState } from 'react';
-import { Home, Users, Search, MapPin, Star, Check } from 'lucide-react';
 import Navbar from './Components/Navbar';
 import Hero from './Components/Hero';
 import Properties from './Components/Properties';
