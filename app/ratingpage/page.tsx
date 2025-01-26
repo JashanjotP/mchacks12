@@ -1,49 +1,75 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Star, MapPin } from 'lucide-react';
 import NavbarTrans from '../Components/NavbarTrans';
 import Footer from '../Components/Footer';
+import { getFirestore, collection, getDocs, query, where, doc, getDoc, orderBy, limit } from 'firebase/firestore';
+import app from "@/firebase/config";
+
+const db = getFirestore(app);
 
 const PropertyRatings = () => {
   const [filterLocation, setFilterLocation] = useState('');
+  const [propertyListings, setPropertyListings] = useState([]);
 
-  // Mock data for properties
-  const propertyListings = [
-    {
-      id: 1,
-      name: "210 Farley Drive",
-      photo: "/api/placeholder/300/200",
-      location: "South Guelph",
-      rating: 9.4,
-      reviews: 21,
-      avgRent: 1250,
-      features: ['Responsive Landlord', 'Newly renovated'],
-      landlord: "Scottie Barnes"
-    },
-    {
-      id: 2,
-      name: "1055 Gordon Street",
-      photo: "/api/placeholder/300/200",
-      location: "South Guelph",
-      rating: 7.6,
-      reviews: 14,
-      avgRent: 1000,
-      features: ['Great Location', 'Heating Problems'],
-      landlord: "DeMarcus Cousins"
-    },
-    {
-      id: 3,
-      name: "102 McKinnon Street",
-      photo: "/api/placeholder/300/200",
-      location: "Downtown",
-      rating: 5.8,
-      reviews: 210,
-      avgRent: 950,
-      features: ['Poor Maintance', 'Water Leaks'],
-      landlord: "Michaela Hilston"
-    }
-  ];
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        // Get all houses
+        const housesCollection = collection(db, 'house');
+        const housesSnapshot = await getDocs(housesCollection);
+        
+        const listings = await Promise.all(housesSnapshot.docs.map(async (houseDoc) => {
+          const houseData = houseDoc.data();
+          
+          // Get reviews for this house
+          const reviewsCollection = collection(db, 'house', houseDoc.id, 'reviews');
+          const reviewsSnapshot = await getDocs(reviewsCollection);
+          
+          let totalHouseRating = 0;
+          let totalLandlordRating = 0;
+          const reviews = reviewsSnapshot.docs.length;
+          
+          reviewsSnapshot.docs.forEach((reviewDoc) => {
+            const reviewData = reviewDoc.data();
+            totalHouseRating += reviewData.houseRating || 0;
+            totalLandlordRating += reviewData.landlordRating || 0;
+          });
+
+          const avgHouseRating = reviews > 0 ? totalHouseRating / reviews : 0;
+          const avgLandlordRating = reviews > 0 ? totalLandlordRating / reviews : 0;
+          
+          // Get latest review for rent and tags
+          const latestReviewQuery = query(
+            collection(db, 'house', houseDoc.id, 'reviews'),
+            orderBy('createdAt', 'desc'),
+            limit(1)
+          );
+          const latestReviewSnapshot = await getDocs(latestReviewQuery);
+          const latestReview = latestReviewSnapshot.docs[0]?.data();
+
+          return {
+            id: houseDoc.id,
+            name: houseData.address,
+            photo: houseData.imageUrl || "", // You might want to store actual photos in Firebase Storage
+            location: houseData.location || "Location not specified",
+            rating: avgHouseRating,
+            reviews: reviews,
+            avgRent: latestReview?.rent || 0,
+            features: latestReview?.tags || [],
+            landlord: houseData.landlord
+          };
+        }));
+
+        setPropertyListings(listings);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+      }
+    };
+
+    fetchProperties();
+  }, []);
 
   // Filtering logic
   const filteredListings = propertyListings.filter(listing => 
