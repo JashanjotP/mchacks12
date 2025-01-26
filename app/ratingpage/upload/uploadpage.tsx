@@ -8,11 +8,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ImagePlus, X } from 'lucide-react';
+import { useLoadScript, Autocomplete } from '@react-google-maps/api';
+import { collection, doc, GeoPoint, getFirestore, serverTimestamp, setDoc } from 'firebase/firestore';
+import app from '@/firebase/config';
 
 const ReviewUploadPage = () => {
   const [formData, setFormData] = useState({
     housePhotos: [],
     address: '',
+    latitude: null,
+    longitude: null,
+    rent: '',
     landlordName: '',
     rent: '',
     landlordRating: '',
@@ -23,6 +29,12 @@ const ReviewUploadPage = () => {
 
   const [formErrors, setFormErrors] = useState({});
   const fileInputRef = useRef(null);
+  const autocompleteRef = useRef(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
+    libraries: ['places']
+  });
 
   // Predefined labels with colors
   const availableLabels = [
@@ -37,11 +49,10 @@ const ReviewUploadPage = () => {
     { name: 'Poor maintance', color: '#FEF3C7' },
     { name: 'Old appliances', color: '#D1FAE5' },
     { name: 'Lease restrictions', color: '#DBEAFE' },
-    
   ];
 
   // Handle input changes (same as previous implementation)
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -55,9 +66,22 @@ const ReviewUploadPage = () => {
     }
   };
 
+  // Handle place selection from Google Maps Autocomplete
+  const handlePlaceSelect = () => {
+    const place = autocompleteRef.current?.getPlace();
+    if (place?.geometry?.location) {
+      setFormData(prev => ({
+        ...prev,
+        address: place.formatted_address || '',
+        latitude: place.geometry.location.lat(),
+        longitude: place.geometry.location.lng()
+      }));
+    }
+  };
+
   // Handle file uploads (same as previous implementation)
-  const handleFileUpload = (e) => {
-    const files = Array.from(e.target.files);
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
     const validImageFiles = files.filter(file => 
       file.type.startsWith('image/') && file.size <= 5 * 1024 * 1024
     );
@@ -74,7 +98,7 @@ const ReviewUploadPage = () => {
   };
 
   // Remove uploaded image
-  const removeImage = (indexToRemove) => {
+  const removeImage = (indexToRemove: number) => {
     setFormData(prev => ({
       ...prev,
       housePhotos: prev.housePhotos.filter((_, index) => index !== indexToRemove)
@@ -82,7 +106,7 @@ const ReviewUploadPage = () => {
   };
 
   // Handle label selection
-  const toggleLabel = (label) => {
+  const toggleLabel = (label: string) => {
     setFormData(prev => ({
       ...prev,
       labels: prev.labels.includes(label)
@@ -93,7 +117,7 @@ const ReviewUploadPage = () => {
 
   // Validation function (same as previous implementation)
   const validateForm = () => {
-    const errors = {};
+    const errors: Record<string, string> = {};
 
     if (!formData.address.trim()) {
       errors.address = 'Address is required';
@@ -103,7 +127,7 @@ const ReviewUploadPage = () => {
       errors.landlordName = 'Landlord name is required';
     }
 
-    const rating = (value) => {
+    const rating = (value: string) => {
       const num = parseFloat(value);
       return !isNaN(num) && num >= 1 && num <= 10;
     };
@@ -124,8 +148,8 @@ const ReviewUploadPage = () => {
       errors.description = 'Description is required';
     }
 
-    if (!formData.rent.trim()) {
-        errors.rent = 'Rent is required';
+    if(!formData.rent.trim()){
+      errors.rent = "Rent is required"
     }
 
     if (!formData.housePhotos) {
@@ -137,18 +161,64 @@ const ReviewUploadPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (validateForm()) {
-      console.log('Submitted Review:', formData);
+      try {
+        // Get reference to Firestore
+        const db = getFirestore(app);
+
+        // Create house document with auto ID
+        const houseRef = doc(collection(db, "house"));
+        await setDoc(houseRef, {
+          address: formData.address,
+          landlord: formData.landlordName,
+          location: new GeoPoint(formData.latitude, formData.longitude)
+        });
+
+        // Add review as subcollection document
+        const reviewRef = doc(collection(houseRef, "reviews"));
+        await setDoc(reviewRef, {
+          createdAt: serverTimestamp(),
+          description: formData.description,
+          houseRating: parseFloat(formData.houseRating),
+          landlordRating: parseFloat(formData.landlordRating), 
+          rent: parseFloat(formData.rent),
+          tags: formData.labels
+        });
+
+        // Reset form after successful submission
+        setFormData({
+          housePhotos: [],
+          address: '',
+          latitude: null,
+          longitude: null,
+          rent: '',
+          landlordName: '',
+          landlordRating: '',
+          houseRating: '',
+          labels: [],
+          description: ''
+        });
+
+        console.log('Successfully submitted review');
+      } catch (error) {
+        console.error('Error submitting review:', error);
+      }
     }
   };
 
   // Trigger file input
   const triggerFileInput = () => {
-    fileInputRef.current.click();
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
   };
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="bg-[#f5f5f4] min-h-screen py-8">
@@ -218,20 +288,29 @@ const ReviewUploadPage = () => {
                 )}
               </div>
 
-              {/* Address */}
+              {/* Address with Google Maps Autocomplete */}
               <div>
                 <Label className="text-[#78350F] font-semibold">House Address</Label>
-                <Input 
-                  type="text" 
-                  name="address"
-                  value={formData.address}
-                  onChange={handleInputChange}
-                  placeholder="Enter house address in the city"
-                  className={`mt-2 focus:border-[#D97706] focus:ring-[#D97706] ${formErrors.address ? 'border-red-500' : ''}`}
-                />
+                <Autocomplete
+                  onLoad={autocomplete => {
+                    autocompleteRef.current = autocomplete;
+                  }}
+                  onPlaceChanged={handlePlaceSelect}
+                  restrictions={{ country: "ca" }}
+                >
+                  <Input 
+                    type="text" 
+                    name="address"
+                    value={formData.address}
+                    onChange={handleInputChange}
+                    placeholder="Enter house address in the city"
+                    className={`mt-2 focus:border-[#D97706] focus:ring-[#D97706] ${formErrors.address ? 'border-red-500' : ''}`}
+                  />
+                </Autocomplete>
                 {formErrors.address && (
                   <p className="text-red-500 text-sm mt-1">{formErrors.address}</p>
                 )}
+              
               </div>
 
               {/* Landlord Name */}
@@ -288,7 +367,6 @@ const ReviewUploadPage = () => {
                   <Label className="text-[#78350F] font-semibold">House Rating</Label>
                   <Input 
                     type="number" 
-                    
                     name="houseRating"
                     value={formData.houseRating}
                     onChange={handleInputChange}
