@@ -1,9 +1,8 @@
 'use client'
 
-import React, { useState } from 'react';
+import React from 'react';
 import Navbar from './Components/Navbar';
 import Hero from './Components/Hero';
-import Properties from './Components/Properties';
 import WhyUs from './Components/WhyUs';
 import Footer from './Components/Footer';
 
