@@ -1,8 +1,63 @@
-import React, { useState } from 'react'
+'use client'
+
+import React, { useCallback, useRef, useState } from 'react'
 import { Search } from 'lucide-react'
+import { Autocomplete, useLoadScript } from '@react-google-maps/api'
+
+const goToRatings = (address: string) => {
+  const q = address.trim()
+  if (!q) return
+  window.location.href = `/ratingpage?q=${encodeURIComponent(q)}`
+}
 
 const Hero = () => {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('')
+  const desktopAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+  const mobileAutocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
+
+  const { isLoaded, loadError } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY ?? '',
+    libraries: ['places'],
+  })
+
+  const applySelectedPlace = useCallback(
+    (ref: React.MutableRefObject<google.maps.places.Autocomplete | null>) => {
+      const place = ref.current?.getPlace()
+      const addr = place?.formatted_address
+      if (addr) setSearchQuery(addr)
+    },
+    []
+  )
+
+  const handleSearch = () => goToRatings(searchQuery)
+
+  const searchDisabled = !searchQuery.trim()
+
+  const desktopInput = (
+    <input
+      type="text"
+      placeholder="Search an address in Guelph"
+      className="flex-1 px-6 py-4 text-lg text-gray-700 placeholder-gray-400 outline-none min-w-0"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleSearch()
+      }}
+    />
+  )
+
+  const mobileInput = (
+    <input
+      type="text"
+      placeholder="Search an address in Guelph"
+      className="flex-1 px-4 py-3 text-base text-gray-700 placeholder-gray-400 outline-none min-w-0"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter') handleSearch()
+      }}
+    />
+  )
 
   return (
     <header className="relative mx-4 md:mx-5 pt-24 md:pt-28 pb-8 md:pb-20 px-6 md:px-8 z-10 bg-amber-100/90 backdrop-blur-sm shadow-md"
@@ -48,29 +103,36 @@ const Hero = () => {
             {/* Search Bar - Desktop only here */}
             <div className="hidden md:block relative">
               <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden">
-                <input 
-                  type="text"
-                  placeholder="Search an address in Guelph"
-                  className="flex-1 px-6 py-4 text-lg text-gray-700 placeholder-gray-400 outline-none"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && searchQuery) {
-                      window.location.href = '/ratingpage';
-                    }
-                  }}
-                />
-                <button 
-                  className="m-1.5 p-3.5 bg-gray-900 hover:bg-gray-800 text-white rounded-full transition-all"
-                  onClick={() => {
-                    if (searchQuery) {
-                      window.location.href = '/ratingpage';
-                    }
-                  }}
+                {isLoaded ? (
+                  <Autocomplete
+                    className="flex-1 min-w-0"
+                    onLoad={(ac) => {
+                      desktopAutocompleteRef.current = ac
+                    }}
+                    onPlaceChanged={() => applySelectedPlace(desktopAutocompleteRef)}
+                    restrictions={{ country: 'ca' }}
+                    options={{ types: ['address'] }}
+                  >
+                    {desktopInput}
+                  </Autocomplete>
+                ) : (
+                  desktopInput
+                )}
+                <button
+                  type="button"
+                  aria-label="Search addresses"
+                  disabled={searchDisabled}
+                  className="m-1.5 p-3.5 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none text-white rounded-full transition-all"
+                  onClick={handleSearch}
                 >
                   <Search size={20} />
                 </button>
               </div>
+              {loadError ? (
+                <p className="mt-2 text-sm text-amber-900/80">
+                  Address search is unavailable. Check your Google Maps API key and Places API.
+                </p>
+              ) : null}
             </div>
           </div>
           
@@ -115,29 +177,36 @@ const Hero = () => {
           {/* Mobile Search Bar - Comes after image */}
           <div className="md:hidden relative w-full">
             <div className="flex items-center bg-white rounded-full shadow-lg overflow-hidden">
-              <input 
-                type="text"
-                placeholder="Search an address in Guelph"
-                className="flex-1 px-4 py-3 text-base text-gray-700 placeholder-gray-400 outline-none"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && searchQuery) {
-                    window.location.href = '/ratingpage';
-                  }
-                }}
-              />
-              <button 
-                className="m-1 p-3 bg-gray-900 hover:bg-gray-800 text-white rounded-full transition-all"
-                onClick={() => {
-                  if (searchQuery) {
-                    window.location.href = '/ratingpage';
-                  }
-                }}
+              {isLoaded ? (
+                <Autocomplete
+                  className="flex-1 min-w-0"
+                  onLoad={(ac) => {
+                    mobileAutocompleteRef.current = ac
+                  }}
+                  onPlaceChanged={() => applySelectedPlace(mobileAutocompleteRef)}
+                  restrictions={{ country: 'ca' }}
+                  options={{ types: ['address'] }}
+                >
+                  {mobileInput}
+                </Autocomplete>
+              ) : (
+                mobileInput
+              )}
+              <button
+                type="button"
+                aria-label="Search addresses"
+                disabled={searchDisabled}
+                className="m-1 p-3 bg-gray-900 hover:bg-gray-800 disabled:opacity-50 disabled:pointer-events-none text-white rounded-full transition-all"
+                onClick={handleSearch}
               >
                 <Search size={18} />
               </button>
             </div>
+            {loadError ? (
+              <p className="mt-2 text-sm text-amber-900/80">
+                Address search is unavailable. Check your Google Maps API key and Places API.
+              </p>
+            ) : null}
           </div>
         </div>
       </header>

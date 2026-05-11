@@ -1,0 +1,7 @@
+- fix authentication
+- remove heap map
+- fix UI for AI lease
+- fix AI 
+- fix database
+- add entries to database
+- marketing 

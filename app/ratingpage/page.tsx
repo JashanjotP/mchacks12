@@ -26,6 +26,12 @@ const PropertyRatings = () => {
   const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
+    if (q) setFilterLocation(q);
+  }, []);
+
+  useEffect(() => {
     const fetchProperties = async () => {
       try {
         // Get all houses
