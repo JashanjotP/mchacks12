@@ -15,6 +15,7 @@ import { getFirestore, collection, addDoc, doc, Timestamp, getDoc, updateDoc } f
 import app from "@/firebase/config";
 
 const db = getFirestore(app);
+const MIN_MONTHLY_RENT = 200;
 
 interface CreateReviewDialogProps {
   id: string;
@@ -28,7 +29,8 @@ export function CreateReviewDialog({ id, name }: CreateReviewDialogProps) {
   const [landlordRating, setLandlordRating] = useState<number>(0);
   const [landlordName, setLandlordName] = useState('');
   const [reviewText, setReviewText] = useState('');
-  const [tags, setTags] = useState(''); 
+  const [tags, setTags] = useState('');
+  const [priceError, setPriceError] = useState('');
 
   // Predefined labels with colors
   const availableLabels = [
@@ -69,6 +71,12 @@ export function CreateReviewDialog({ id, name }: CreateReviewDialogProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (price < MIN_MONTHLY_RENT) {
+      setPriceError(`Monthly rent must be at least $${MIN_MONTHLY_RENT}`);
+      return;
+    }
+    setPriceError('');
     
     try {
       const houseRef = doc(db, 'house', id);
@@ -124,10 +132,10 @@ export function CreateReviewDialog({ id, name }: CreateReviewDialogProps) {
               id="rating"
               type="number" 
               min="1" 
-              max="10" 
+              max="5" 
               value={rating || ''}
               onChange={(e) => setRating(Number(e.target.value))}
-              placeholder="Rate 1-10"
+              placeholder="Rate 1-5"
               required
             />
           </div>
@@ -148,10 +156,10 @@ export function CreateReviewDialog({ id, name }: CreateReviewDialogProps) {
               id="landlord-rating"
               type="number"
               min="1"
-              max="10"
+              max="5"
               value={landlordRating || ''}
               onChange={(e) => setLandlordRating(Number(e.target.value))}
-              placeholder="Rate 1-10"
+              placeholder="Rate 1-5"
               required
             />
           </div>
@@ -160,11 +168,19 @@ export function CreateReviewDialog({ id, name }: CreateReviewDialogProps) {
             <Input 
               id="price"
               type="number"
+              min={MIN_MONTHLY_RENT}
               value={price || ''}
-              onChange={(e) => setPrice(Number(e.target.value))}
-              placeholder="Rent per room"
+              onChange={(e) => {
+                setPrice(Number(e.target.value));
+                setPriceError('');
+              }}
+              placeholder="Rent per room (min $200)"
               required
+              className={priceError ? 'border-red-500' : ''}
             />
+            {priceError ? (
+              <p className="text-red-500 text-sm mt-1">{priceError}</p>
+            ) : null}
           </div>
           
           <div>

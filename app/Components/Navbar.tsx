@@ -23,7 +23,6 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center bg-white/80 backdrop-blur-md rounded-full px-2 py-2 shadow-lg border border-gray-100">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/ratingpage">Ratings</NavLink>
-          <NavLink href="/heatmap">Heat Map</NavLink>
           <NavLink href="/lease">Lease Check</NavLink>
         </div>
 
@@ -50,7 +49,6 @@ const Navbar = () => {
           <div className="flex flex-col space-y-2">
             <MobileNavLink href="/" onClick={() => setIsMenuOpen(false)}>Home</MobileNavLink>
             <MobileNavLink href="/ratingpage" onClick={() => setIsMenuOpen(false)}>Ratings</MobileNavLink>
-            <MobileNavLink href="/heatmap" onClick={() => setIsMenuOpen(false)}>Heat Map</MobileNavLink>
             <MobileNavLink href="/lease" onClick={() => setIsMenuOpen(false)}>Lease Check</MobileNavLink>
             <a 
               href="/ratingpage" 

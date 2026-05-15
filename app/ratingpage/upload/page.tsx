@@ -7,7 +7,7 @@ const page = () => {
   return (
     <>
         <NavbarTrans/>
-        <div className='mt-20'>
+        <div className="mt-24 pb-16">
             <ReviewUploadPage/>
         </div>
         <Footer/>

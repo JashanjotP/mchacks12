@@ -6,6 +6,9 @@ import NavbarTrans from '../Components/NavbarTrans';
 import Footer from '../Components/Footer';
 import { getFirestore, collection, getDocs, query, where, doc, getDoc, orderBy, limit } from 'firebase/firestore';
 import app from "@/firebase/config";
+import { RatingBadge } from '../Components/RatingBadge';
+import { normalizeToFivePoint } from '@/lib/ratings';
+import { fetchPropertyPhotoUrl } from '@/lib/google-place-photo';
 
 const db = getFirestore(app);
 
@@ -51,8 +54,8 @@ const PropertyRatings = () => {
           
           reviewsSnapshot.docs.forEach((reviewDoc) => {
             const reviewData = reviewDoc.data();
-            totalHouseRating += reviewData.houseRating || 0;
-            totalLandlordRating += reviewData.landlordRating || 0;
+            totalHouseRating += normalizeToFivePoint(reviewData.houseRating || 0);
+            totalLandlordRating += normalizeToFivePoint(reviewData.landlordRating || 0);
           });
 
           const avgHouseRating = reviews > 0 ? totalHouseRating / reviews : 0;
@@ -67,10 +70,22 @@ const PropertyRatings = () => {
           const latestReviewSnapshot = await getDocs(latestReviewQuery);
           const latestReview = latestReviewSnapshot.docs[0]?.data();
 
+          let photo = houseData.imageUrl as string | undefined
+          if (!photo && houseData.location) {
+            const lat = houseData.location.latitude
+            const lng = houseData.location.longitude
+            photo =
+              (await fetchPropertyPhotoUrl(
+                lat,
+                lng,
+                houseData.address ?? ''
+              )) ?? undefined
+          }
+
           return {
             id: houseDoc.id,
             name: houseData.address,
-            photo: houseData.imageUrl || "/house.png", // You might want to store actual photos in Firebase Storage
+            photo: photo || '/house.png',
             location: houseData.location || "Location not specified",
             rating: avgHouseRating,
             reviews: reviews,
@@ -132,6 +147,11 @@ const PropertyRatings = () => {
                     src={listing.photo} 
                     alt={listing.name} 
                     className="w-55 h-40 border border-gray object-cover rounded-xl"
+                    onError={(e) => {
+                      const img = e.currentTarget
+                      if (img.src.endsWith('/house.png')) return
+                      img.src = '/house.png'
+                    }}
                 />
               </div>
 
@@ -146,9 +166,7 @@ const PropertyRatings = () => {
                   
                   {/* Average Rating */}
                   <div className="text-right">
-                    <div className="bg-blue-200 text-3xl font-bold text-blue-800 p-2 rounded-lg inline-block shadow-md">
-                        {listing.rating.toFixed(1)}
-                    </div>
+                    <RatingBadge rating={listing.rating} className="text-3xl px-4 py-3" />
                   </div>
                 </div>
 
@@ -183,7 +201,7 @@ const PropertyRatings = () => {
         <div className="mt-10 text-right">
           <a href="/ratingpage/upload">
             <button className="bg-blue-600 text-white font-bold py-2 px-4 rounded hover:bg-blue-800">
-              Create New Review
+              Add a rating
             </button>
           </a>
         </div>

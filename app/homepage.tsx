@@ -3,7 +3,6 @@
 import React from 'react';
 import Navbar from './Components/Navbar';
 import Hero from './Components/Hero';
-import WhyUs from './Components/WhyUs';
 import Footer from './Components/Footer';
 
 const HomePage = () => {
@@ -24,9 +23,6 @@ const HomePage = () => {
 
       {/* Hero Section */}
       <Hero/>
-
-      {/* Why Choose Us */}
-      <WhyUs/>
 
       {/* Footer */}
       <Footer/>

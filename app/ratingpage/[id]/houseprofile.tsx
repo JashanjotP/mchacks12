@@ -9,6 +9,8 @@ import Footer from '@/app/Components/Footer';
 import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, limit } from 'firebase/firestore';
 import app from "@/firebase/config";
 import { CreateReviewDialog } from './dialog';
+import { RatingBadge } from '@/app/Components/RatingBadge';
+import { normalizeToFivePoint, ratingDistributionOutOfFive } from '@/lib/ratings';
 
 const db = getFirestore(app);
 
@@ -41,13 +43,15 @@ const HouseProfilePage = ({ id }: { id: string }) => {
 
         reviewsSnapshot.docs.forEach((reviewDoc) => {
           const reviewData = reviewDoc.data();
-          totalHouseRating += reviewData.houseRating || 0;
-          totalLandlordRating += reviewData.landlordRating || 0;
-          
+          const houseRating = normalizeToFivePoint(reviewData.houseRating || 0);
+          const landlordRating = normalizeToFivePoint(reviewData.landlordRating || 0);
+          totalHouseRating += houseRating;
+          totalLandlordRating += landlordRating;
+
           reviews.push({
             id: reviewDoc.id,
-            rating: reviewData.houseRating,
-            landlordRating: reviewData.landlordRating,
+            rating: houseRating,
+            landlordRating,
             description: reviewData.description,
             price: reviewData.rent,
             date: reviewData.createdAt?.toDate().toISOString().split('T')[0] || ''
@@ -83,16 +87,10 @@ const HouseProfilePage = ({ id }: { id: string }) => {
     fetchHouseData();
   }, []);
 
-  // Function to generate rating distribution
-  const generateRatingDistribution = () => {
-    const ratingCounts = new Array(10).fill(0);
-    houseData.reviews.forEach(review => {
-      ratingCounts[Math.floor(review.rating) - 1]++;
-    });
-    return ratingCounts;
-  };
-
-  const ratingDistribution = generateRatingDistribution();
+  const ratingDistribution = ratingDistributionOutOfFive(
+    houseData.reviews.map((r) => r.rating)
+  );
+  const maxDistributionCount = Math.max(...ratingDistribution, 1);
 
   return (
     <div className=" min-h-screen">
@@ -118,13 +116,11 @@ const HouseProfilePage = ({ id }: { id: string }) => {
             <div>
               <p className="text-[#78350F]">Landlord: <span className="font-semibold">{houseData.landlordName}</span></p>
             </div>
-            <div className="text-right">
-              <p className="text-[#78350F]">
-                House Rating: <span className="font-bold text-[#D97706]">{houseData.houseRating.toFixed(1)}</span>
-              </p>
-              <p className="text-[#78350F]">
-                Landlord Rating: <span className="font-bold text-[#D97706]">{houseData.landlordRating.toFixed(1)}</span>
-              </p>
+            <div className="text-right space-y-2">
+              <p className="text-[#78350F] text-sm">House rating</p>
+              <RatingBadge rating={houseData.houseRating} />
+              <p className="text-[#78350F] text-sm pt-1">Landlord rating</p>
+              <RatingBadge rating={houseData.landlordRating} />
             </div>
           </div>
         </div>
@@ -132,7 +128,9 @@ const HouseProfilePage = ({ id }: { id: string }) => {
         {/* Ratings Distribution */}
         <Card className="bg-white shadow-sm rounded-xl">
           <CardHeader>
-            <CardTitle className="text-[#78350F]">Ratings Distribution</CardTitle>
+            <CardTitle className="text-[#78350F]">
+              Ratings distribution
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex justify-between items-end h-40 space-x-1">
@@ -141,9 +139,9 @@ const HouseProfilePage = ({ id }: { id: string }) => {
                   <div 
                     className={`w-full rounded-t-sm ${count > 0 ? 'bg-[#D97706]' : 'bg-gray-200'} 
                       group-hover:opacity-80 transition-all`}
-                    style={{ 
-                      height: `${Math.max(count * 20, 10)}px`,
-                      minHeight: '10px'
+                    style={{
+                      height: `${Math.max((count / maxDistributionCount) * 120, count > 0 ? 12 : 8)}px`,
+                      minHeight: '8px',
                     }}
                   ></div>
                   <span className="text-xs mt-2 text-[#78350F]">{index + 1}</span>
@@ -176,12 +174,8 @@ const HouseProfilePage = ({ id }: { id: string }) => {
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-2">
                     <div className='grid grid-cols-2 gap-5'>
-                      <div className="bg-blue-100 text-2xl font-bold text-blue-800 p-2 rounded-lg inline-block shadow-md">
-                        {review.rating.toFixed(1)}
-                      </div>
-                      <div className="bg-[#d9770675] text-2xl font-bold text-orange-800 p-2 rounded-lg inline-block shadow-md">
-                        {review.landlordRating.toFixed(1)}
-                      </div>
+                      <RatingBadge rating={review.rating} />
+                      <RatingBadge rating={review.landlordRating} />
                     </div>
                     <div className="bg-green-200 text-2xl font-bold text-green-800 p-2 rounded-lg inline-block shadow-md">
                       ${review.price.toFixed(2)}
